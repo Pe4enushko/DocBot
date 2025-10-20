@@ -1,0 +1,6 @@
+nltk                3.9.2
+openai              2.3.0
+PyPDF2              3.0.1
+python-telegram-bot 22.5
+regex               2025.9.18
+requests            2.32.5
