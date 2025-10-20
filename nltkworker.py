@@ -1,5 +1,5 @@
 import nltk
-from nltk.tokenize import sent_tokenize
+from nltk.tokenize import sent_tokenize, word_tokenize
 import re
 
 # Download required NLTK data (run once)
@@ -36,9 +36,9 @@ def shorten_technical_text(text):
         r'\b[Tt]est\b',
         r'\b[Mm]easure\b',
     ]
-    
+
     # Tokenize text into sentences
-    sentences = sent_tokenize(text)
+    sentences = nltk.WordPunctTokenizer().tokenize(text)
     relevant_sentences = []
     
     for sentence in sentences:
@@ -53,3 +53,6 @@ def shorten_technical_text(text):
             relevant_sentences.append(sentence)
     
     return ' '.join(relevant_sentences)
+
+def count_tokens(text):
+    return len(nltk.WordPunctTokenizer().tokenize(text))

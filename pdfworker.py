@@ -1,6 +1,6 @@
-import os, PyPDF2
+import os, PyPDF2, logging, nltk
 from nltk.corpus import stopwords
-from nltk.tokenize import word_tokenize
+from nltk.tokenize import sent_tokenize
 
 def get_data_dirs():
     """Return list of subdirectory names inside the 'data' directory."""
@@ -48,7 +48,32 @@ def create_directories():
             os.makedirs('data/'+dir_name.strip(), exist_ok=True)
 
 
-def process_pdf_to_chunks(pdf_path, chunk_size=90000):
+def process_text_to_chunks(text, chunk_size=60000):
+    """
+    Extract text from PDF, remove stopwords, and split into chunks of ~90k words.
+    
+    Args:
+        pdf_path (str): Path to the PDF file
+        chunk_size (int): Number of words per chunk (default: 90,000)
+    
+    Returns:
+        list: List of text chunks
+    """
+
+    # Remove stopwords
+    stop_words = set(stopwords.words('english'))
+    tokens = nltk.WordPunctTokenizer().tokenize(text)
+    filtered_words = [token for token in tokens if token.lower() not in stop_words and token.isalnum()]
+    
+    # Split into chunks
+    chunks = []
+    for i in range(0, len(filtered_words), chunk_size):
+        chunk = ' '.join(filtered_words[i:i + chunk_size])
+        chunks.append(chunk)
+    
+    return chunks
+
+def process_pdf_to_chunks(pdf_path, chunk_size=60000):
     """
     Extract text from PDF, remove stopwords, and split into chunks of ~90k words.
     
@@ -67,10 +92,16 @@ def process_pdf_to_chunks(pdf_path, chunk_size=90000):
             text += page.extract_text() + "\n"
     
     # Remove stopwords
-    stop_words = set(stopwords.words('english'))
-    words = word_tokenize(text)
-    filtered_words = [word for word in words if word.lower() not in stop_words and word.isalnum()]
+    stop_words = stopwords.words('english')
+    tokens = nltk.WordPunctTokenizer().tokenize(text)
+
+    logging.log(level=logging.INFO, msg="tokens: " + str(len(tokens)))
+    logging.log(level=logging.INFO, msg=tokens[0:50])
+
+    filtered_words = [token for token in tokens if (token.lower() not in stop_words) and token.isalnum()]
     
+    logging.log(level=logging.INFO, msg="filtered_tokens: " + str(len(filtered_words)))
+
     # Split into chunks
     chunks = []
     for i in range(0, len(filtered_words), chunk_size):
@@ -78,7 +109,6 @@ def process_pdf_to_chunks(pdf_path, chunk_size=90000):
         chunks.append(chunk)
     
     return chunks
-
 
 def get_files_to_process():
     dir1 = '/home/pe4enushko/Documents/Literature/'
