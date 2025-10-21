@@ -95,12 +95,7 @@ def process_pdf_to_chunks(pdf_path, chunk_size=60000):
     stop_words = stopwords.words('english')
     tokens = nltk.WordPunctTokenizer().tokenize(text)
 
-    logging.log(level=logging.INFO, msg="tokens: " + str(len(tokens)))
-    logging.log(level=logging.INFO, msg=tokens[0:50])
-
     filtered_words = [token for token in tokens if (token.lower() not in stop_words) and token.isalnum()]
-    
-    logging.log(level=logging.INFO, msg="filtered_tokens: " + str(len(filtered_words)))
 
     # Split into chunks
     chunks = []
